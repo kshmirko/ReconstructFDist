@@ -19,14 +19,17 @@
     INTEGER RANK
     INTEGER(8), ALLOCATABLE :: DIMS(:)
     REAL(4), ALLOCATABLE :: X(:)
-    CHARACTER*80    ::  FILENAME = "mieDB_new.h5"
+    CHARACTER(len=80)    ::  FILENAME = "mieDB_new.h5"
     CHARACTER(Len=10)    ::  dataset = 'mR'
+    
+    ! read data from hdf file
     CALL LOAD_DS(filename, dataset, x, rank, dims)
     
     write(*,100) dataset, rank
     write(*,101) dims
+
     if (.not. allocated(X)) STOP "X not allocated"
-    print *,X(1:10)
+    print *,X
     deallocate(dims, X)
 
 100 format('Rank(',A,') = ', I2)

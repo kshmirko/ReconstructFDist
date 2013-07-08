@@ -1,14 +1,9 @@
 module LoadDB
 implicit none
 
+private
+public load_ds
 interface load_ds
-    !subroutine load_1d_ds(filename, dataset, x, rank, dims)
-    !    CHARACTER(LEN=*), intent(IN) :: filename
-    !    CHARACTER(LEN=*) , intent(in) :: dataset
-    !    real*4, DIMENSION(:), allocatable, intent(inout) :: X
-    !    INTEGER :: rank
-    !    INTEGER(HSIZE_T),allocatable   :: dims(:)
-    !end subroutine
     MODULE PROCEDURE load_1d_ds,load_2d_ds,load_3d_ds,load_4d_ds
 end interface load_ds
 
@@ -33,7 +28,7 @@ subroutine load_1d_ds(filename, dataset, x, rank, dims)
   ! Initialize FORTRAN interface.
   !
   CALL h5open_f(hdferr)
-  !
+  ! 
 
   ! Now we begin the read section of this example. 
   !
