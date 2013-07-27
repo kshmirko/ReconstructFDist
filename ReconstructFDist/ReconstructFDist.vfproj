@@ -29,7 +29,8 @@
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<Filter Name="modules">
 		<File RelativePath=".\Config.f90"/>
-		<File RelativePath=".\LoadDB.f90"/></Filter>
+		<File RelativePath=".\LoadDB.f90"/>
+		<File RelativePath=".\MathUtils.f90"/></Filter>
 		<File RelativePath=".\ReconstructFDist.f90"/></Filter>
 		<File RelativePath=".\ReadMe.txt"/></Files>
 	<Globals/></VisualStudioProject>
