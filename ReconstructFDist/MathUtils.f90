@@ -1,134 +1,134 @@
-MODULE MathUtils
-USE mkl95_PRECISION, ONLY: WP => DP
-USE mkl95_LAPACK, ONLY: GELSS
+MODULE MATHUTILS
+USE MKL95_PRECISION, ONLY: WP => DP
+USE MKL95_LAPACK, ONLY: GELSS
 IMPLICIT NONE
 
 CONTAINS
 
-!ccccccccccccccccccccccccccccccccccccccccccccc
-!создаем логарифмически-эквидистантную 
-!последовательность
-! R=10**[lR1,lR2,...,lRn], dlR = (lRn-lR1)/(N-1)
-! lR1 = LOG10(R1)
-!ccccccccccccccccccccccccccccccccccccccccccccc
-SUBROUTINE LOGSPACE_S(r1, r2, R, N)
-REAL*8, INTENT(IN)  ::  r1, r2
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!СОЗДАЕМ ЛОГАРИФМИЧЕСКИ-ЭКВИДИСТАНТНУЮ 
+!ПОСЛЕДОВАТЕЛЬНОСТЬ
+! R=10**[LR1,LR2,...,LRN], DLR = (LRN-LR1)/(N-1)
+! LR1 = LOG10(R1)
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+SUBROUTINE LOGSPACE_S(R1, R2, R, N)
+REAL*8, INTENT(IN)  ::  R1, R2
 INTEGER*4, INTENT(IN)   :: N
 INTEGER I
-REAL*8, INTENT(inout) :: R(N)
-REAL*8  lr1, lr2, dr
-! Создаем монотонно возрастающую последовательность
-R = (/(i,i=0,N-1)/)
-! получаем лесую и правую границы интервала в логарифмах
-lr1 = LOG10(r1)
-lr2 = LOG10(r2)
-! рассчитываем шаг последовательноси в логарифмах
-dr = (lr2-lr1)/(N-1)
+REAL*8, INTENT(INOUT) :: R(N)
+REAL*8  LR1, LR2, DR
+! СОЗДАЕМ МОНОТОННО ВОЗРАСТАЮЩУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ
+R = (/(I,I=0,N-1)/)
+! ПОЛУЧАЕМ ЛЕСУЮ И ПРАВУЮ ГРАНИЦЫ ИНТЕРВАЛА В ЛОГАРИФМАХ
+LR1 = LOG10(R1)
+LR2 = LOG10(R2)
+! РАССЧИТЫВАЕМ ШАГ ПОСЛЕДОВАТЕЛЬНОСИ В ЛОГАРИФМАХ
+DR = (LR2-LR1)/(N-1)
 
-! избавляемся от логарифмов, потенцируя полученный вектор
-R = 10**(R(1:N)*dr+lr1)
+! ИЗБАВЛЯЕМСЯ ОТ ЛОГАРИФМОВ, ПОТЕНЦИРУЯ ПОЛУЧЕННЫЙ ВЕКТОР
+R = 10**(R(1:N)*DR+LR1)
 END SUBROUTINE LOGSPACE_S
 
-!cccccccccccccccccccccccccccccccccccccccccccc
-!создаем эквидистантную последовательность
-!R = [R1,R2,...Rn], dR = (Rn-R1)/(N-1)
-!cccccccccccccccccccccccccccccccccccccccccccc
-SUBROUTINE LINSPACE_S(r1, r2, R, N)
-REAL*8, INTENT(IN)  ::  r1, r2
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!СОЗДАЕМ ЭКВИДИСТАНТНУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ
+!R = [R1,R2,...RN], DR = (RN-R1)/(N-1)
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+SUBROUTINE LINSPACE_S(R1, R2, R, N)
+REAL*8, INTENT(IN)  ::  R1, R2
 INTEGER*4, INTENT(IN)   :: N
 INTEGER I
-REAL*8 :: R(N), dr
+REAL*8 :: R(N), DR
 
-! Создаем монотонно возрастающую последовательность с шагом 1 начиная с нуля
-R = (/(i,i=0,N-1)/)
+! СОЗДАЕМ МОНОТОННО ВОЗРАСТАЮЩУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ С ШАГОМ 1 НАЧИНАЯ С НУЛЯ
+R = (/(I,I=0,N-1)/)
 
-! рассчитываем шаг последовательноси 
-dr = (r2-r1)/(N-1)
+! РАССЧИТЫВАЕМ ШАГ ПОСЛЕДОВАТЕЛЬНОСИ 
+DR = (R2-R1)/(N-1)
 
-!Вормируем последовательность в заданных границах
-R = R(1:N)*dr+r1
-END SUBROUTINE linspace_s
+!ВОРМИРУЕМ ПОСЛЕДОВАТЕЛЬНОСТЬ В ЗАДАННЫХ ГРАНИЦАХ
+R = R(1:N)*DR+R1
+END SUBROUTINE LINSPACE_S
 
 
-!ccccccccccccccccccccccccccccccccccccccccccccc
-!создаем логарифмически-эквидистантную 
-!последовательность
-! R=10**[lR1,lR2,...,lRn], dlR = (lRn-lR1)/(N-1)
-! lR1 = LOG10(R1)
-!ccccccccccccccccccccccccccccccccccccccccccccc
-FUNCTION LOGSPACE_F(r1, r2, N) RESULT(R)
-REAL*8, INTENT(IN)  ::  r1, r2
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!СОЗДАЕМ ЛОГАРИФМИЧЕСКИ-ЭКВИДИСТАНТНУЮ 
+!ПОСЛЕДОВАТЕЛЬНОСТЬ
+! R=10**[LR1,LR2,...,LRN], DLR = (LRN-LR1)/(N-1)
+! LR1 = LOG10(R1)
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+FUNCTION LOGSPACE_F(R1, R2, N) RESULT(R)
+REAL*8, INTENT(IN)  ::  R1, R2
 INTEGER*4, INTENT(IN)   :: N
 INTEGER I
-REAL*8 :: R(N), lr1, lr2, dr
-! Создаем монотонно возрастающую последовательность
-R = (/(i,i=0,N-1)/)
-! получаем лесую и правую границы интервала в логарифмах
-lr1 = LOG10(r1)
-lr2 = LOG10(r2)
-! рассчитываем шаг последовательноси в логарифмах
-dr = (lr2-lr1)/(N-1)
+REAL*8 :: R(N), LR1, LR2, DR
+! СОЗДАЕМ МОНОТОННО ВОЗРАСТАЮЩУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ
+R = (/(I,I=0,N-1)/)
+! ПОЛУЧАЕМ ЛЕСУЮ И ПРАВУЮ ГРАНИЦЫ ИНТЕРВАЛА В ЛОГАРИФМАХ
+LR1 = LOG10(R1)
+LR2 = LOG10(R2)
+! РАССЧИТЫВАЕМ ШАГ ПОСЛЕДОВАТЕЛЬНОСИ В ЛОГАРИФМАХ
+DR = (LR2-LR1)/(N-1)
 
-! избавляемся от логарифмов, потенцируя полученный вектор
-R = 10**(R*dr+lr1)
+! ИЗБАВЛЯЕМСЯ ОТ ЛОГАРИФМОВ, ПОТЕНЦИРУЯ ПОЛУЧЕННЫЙ ВЕКТОР
+R = 10**(R*DR+LR1)
 END FUNCTION LOGSPACE_F
 
 
-!cccccccccccccccccccccccccccccccccccccccccccc
-!создаем эквидистантную последовательность
-!R = [R1,R2,...Rn], dR = (Rn-R1)/(N-1)
-!cccccccccccccccccccccccccccccccccccccccccccc
-FUNCTION LINSPACE_F(r1, r2, N) RESULT(R)
-REAL*8, INTENT(IN)  ::  r1, r2
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!СОЗДАЕМ ЭКВИДИСТАНТНУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ
+!R = [R1,R2,...RN], DR = (RN-R1)/(N-1)
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+FUNCTION LINSPACE_F(R1, R2, N) RESULT(R)
+REAL*8, INTENT(IN)  ::  R1, R2
 INTEGER*4, INTENT(IN)   :: N
 INTEGER I
-REAL*8 :: R(N), dr
+REAL*8 :: R(N), DR
 
-! Создаем монотонно возрастающую последовательность с шагом 1 начиная с нуля
-R = (/(i,i=0,N-1)/)
+! СОЗДАЕМ МОНОТОННО ВОЗРАСТАЮЩУЮ ПОСЛЕДОВАТЕЛЬНОСТЬ С ШАГОМ 1 НАЧИНАЯ С НУЛЯ
+R = (/(I,I=0,N-1)/)
 
-! рассчитываем шаг последовательноси 
-dr = (r2-r1)/(N-1)
+! РАССЧИТЫВАЕМ ШАГ ПОСЛЕДОВАТЕЛЬНОСИ 
+DR = (R2-R1)/(N-1)
 
-!Вормируем последовательность в заданных границах
-R = R*dr+r1
+!ВОРМИРУЕМ ПОСЛЕДОВАТЕЛЬНОСТЬ В ЗАДАННЫХ ГРАНИЦАХ
+R = R*DR+R1
 END FUNCTION LINSPACE_F
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-! создаем 1 треугольную базисную функцию
-! tri(Xc,t)=max(0, 1-|Xc-t|)
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-SUBROUTINE TRI(Xc, t, B, N)
-REAL*8, INTENT(IN)  :: Xc
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+! СОЗДАЕМ 1 ТРЕУГОЛЬНУЮ БАЗИСНУЮ ФУНКЦИЮ
+! TRI(XC,T)=MAX(0, 1-|XC-T|)
+!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+SUBROUTINE TRI(XC, T, B, N)
+REAL*8, INTENT(IN)  :: XC
 INTEGER, INTENT(IN) :: N
-REAL*8, INTENT(IN)  :: t(N)
+REAL*8, INTENT(IN)  :: T(N)
 REAL*8, INTENT(OUT) :: B(N)
 INTEGER I
 
-B = MAX(0.0,1.0-ABS(Xc-t))
+B = MAX(0.0,1.0-ABS(XC-T))
 
 END SUBROUTINE TRI
 
-SUBROUTINE BASISMATRIX(B,R,knts,N,M)
+SUBROUTINE BASISMATRIX(B,R,KNTS,N,M)
 INTEGER, INTENT(IN) :: N,M
-REAL*8, INTENT(IN)  :: R(N), knts(M)
+REAL*8, INTENT(IN)  :: R(N), KNTS(M)
 REAL*8, INTENT(OUT) :: B(N,M)
 INTEGER I
 
-! Каждый столбец матрицы - треугольный базисный вектор с центром в узлах knts
-do I=1,M
-    CALL TRI(knts(I), R, B(:,I), N)
-enddo
+! КАЖДЫЙ СТОЛБЕЦ МАТРИЦЫ - ТРЕУГОЛЬНЫЙ БАЗИСНЫЙ ВЕКТОР С ЦЕНТРОМ В УЗЛАХ KNTS
+DO I=1,M
+    CALL TRI(KNTS(I), R, B(:,I), N)
+ENDDO
 
-!У первого и последнего базисных векторов убираем 
-!левую и правую части соответственно
-where (R .LT. knts(1))
+!У ПЕРВОГО И ПОСЛЕДНЕГО БАЗИСНЫХ ВЕКТОРОВ УБИРАЕМ 
+!ЛЕВУЮ И ПРАВУЮ ЧАСТИ СООТВЕТСТВЕННО
+WHERE (R .LT. KNTS(1))
     B(:,1)=0.0
-endwhere
+ENDWHERE
 
-where (R .GT. knts(M))
+WHERE (R .GT. KNTS(M))
     B(:,M)=0.0
-endwhere
+ENDWHERE
 END SUBROUTINE BASISMATRIX
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -186,7 +186,7 @@ END SUBROUTINE DECOMPOSE_VECTOR_S
 
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !C СЛЕДУЮЩАЯ ПРОЦЕДУРА ОСУЩЕСТВЛЯЕТ РАЗЛОЖЕНИЕ ПО ТРЕУГОЛЬНОМУ БАЗИСУ 
-!C ТАБЛИЧНО ЗАДАННЦЮ ФУНКЦИЮ (R,Fi), ГДЕ I=1..M - ЧИСЛО ФУНКЦИЙ 
+!C ТАБЛИЧНО ЗАДАННЦЮ ФУНКЦИЮ (R,FI), ГДЕ I=1..M - ЧИСЛО ФУНКЦИЙ 
 !C В УЗЛОВЫХ ТОЧКАХ {KNTS}.
 !C РЕЗУЛЬТАТ РАЗЛОЖЕНИЯ ВОЗВРАЩАЕТСЯ В ВИДЕ КОЭФФИЦИЕНТОВ {C}
 !C R1, R2 - ГРАНИЦЫ ИНТЕРВАЛА РАЗЛОЖЕНИЯ
@@ -232,6 +232,17 @@ IF(TRANS .EQ. .TRUE.) C = TRANSPOSE(C)
 
 END SUBROUTINE DECOMPOSE_MATRIX_S
 
+FUNCTION TRAPZ(X,Y,N) RESULT(RES)
+    INTEGER, INTENT(IN) ::  N
+    INTEGER I
+    REAL*8, INTENT(IN)  ::  X(N), Y(N)
+    REAL*8  RES
+    RES=0
 
+    DO I=1, N-1
+        RES=RES+0.5*(Y(I)+Y(I+1))*(X(I+1)-X(I))
+    END DO
+    return
+END FUNCTION TRAPZ
 
-END MODULE MathUtils
+END MODULE MATHUTILS
