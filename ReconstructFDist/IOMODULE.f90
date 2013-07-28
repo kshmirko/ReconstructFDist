@@ -41,6 +41,7 @@ CONTAINS
         WRITE(*,'(80i3)', ADVANCE='NO') wdata(i,:)
         WRITE(*,'(" ]")')
         ENDDO
+        
         !
         ! Create a new file using the default properties.
         !
