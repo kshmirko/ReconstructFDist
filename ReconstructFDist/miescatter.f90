@@ -1,3 +1,42 @@
+!c*********** Light Scattering by Spherical Particles *************
+!c                                                                *
+!c   Calculations of extinction, scattering, absorption, etc      *
+!c  efficiency factors for homogeneous spheres (the Mie theory).  *
+!c................................................................*
+!c  Input data:          filename:   mie.dat                      *
+!c   ri = n-k*i: complex index of refraction                      *
+!c           Nx: number of sizes                                  *
+!c           x1: size 1                                           *
+!c           x2: size 2                                           *
+!c          ...: ...                                              *
+!c................................................................*
+!c  Output data:         filename:   mie.out                      *
+!c   Qext : extinction factors                                    *
+!c   Qsca : scattering factors                                    *
+!c   Qabs : absorption factors                                    *
+!c   Qbk  : backscattering factors                                *
+!c   Qpr  : radiation pressure factors                            *
+!c  albedo: particle's albedo                                     *
+!c   g    : asymmetry factor                                      *
+!c................................................................*
+!c NB! In order to treat very large particles,                    *
+!c     one needs to enlarge the parameter NTERMS.                 *
+!c................................................................*
+!c created by N.V. Voshchinnikov                                  *
+!c with a support of the Volkswagen Foundation (Germany)          *
+!c (c) 1989/98 Astronomical Institute, St.Petersburg University   *
+!c*****************************************************************
+!
+!c--------------------------------------------------------------------
+!c **********   shexq - Sphers: homogeneous
+!c                      Theory: exact
+!c                      Results: efficiency factors
+!c--------------------------------------------------------------------
+module mieScatter
+private
+public calcScatt
+
+contains
       SUBROUTINE calcScatt(RI, X,QEXT,QSCA,qabs,qbk,qpr,alb,g,n)
       IMPLICIT NONE
       COMPLEX*16 RI
@@ -8,7 +47,8 @@
       DO I=1,n
       call shexq(RI,X(I),QEXT(I),QSCA(I),qabs(I),qbk(I),qpr(I),alb(I), g(I))
       end do
-      END
+      return
+      END subroutine calcScatt
       
 
       SUBROUTINE shexq(RI,X,QEXT,QSCA,qabs,qbk,qpr,alb,g)
@@ -39,7 +79,7 @@
       alb=qsca/qext
       g=(qext-qpr)/qsca
       RETURN                                                            
-      END                                                               
+      END SUBROUTINE shexq
 !c--------------------------------------------------------------------
 !c NM-auxiliary function for AA & BESSEL
 !c    (number NM is calculated using X)
@@ -57,7 +97,7 @@
       RETURN
    12 NM=1.0625*X+28.5
       RETURN
-      END
+      END FUNCTION NM
 !c--------------------------------------------------------------------
 !c AA-subroutine for calculations of the ratio of the derivative
 !c    to the function for Bessel functions of half order with
@@ -81,7 +121,7 @@
       S1=I1*S
    13 RU(I)=S1-1.0D0/(RU(I1)+S1)
       RETURN
-      END
+      END SUBROUTINE AA
 !c--------------------------------------------------------------------
 !c BESSEL-subroutine for calculations of the Bessel functions
 !c    of half order and first (J(N)) second (Y(N)) kinds with
@@ -120,7 +160,7 @@
       I2=I-2
    14 BESY(I)=(2.0D0*I2+1.0D0)*A*BESY(I-1)-BESY(I2)
       RETURN
-      END
+      END SUBROUTINE BESSEL
 !c--------------------------------------------------------------------
 !c AB-subroutine for calculations of the complex coefficients
 !c    A(N), B(N) for spherical particles.
@@ -150,7 +190,7 @@
    11 CONTINUE
    12 NUM1=I
       RETURN
-      END
+      END SUBROUTINE AB
 !c--------------------------------------------------------------------
 !c QQ1-subroutine for calculations of the efficiency factors for
 !c     extinction (QEXT), scattering (QSCA), backscattering (QBK)
@@ -177,5 +217,6 @@
       qbk=2d0*b*r*dconjg(r)
       qpr=qext-2d0*b*s
       RETURN
-      END
+      END SUBROUTINE QQ1
 !c=== eof ===
+end module mieScatter
