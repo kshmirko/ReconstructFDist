@@ -4,9 +4,48 @@ IMPLICIT NONE
 CONTAINS    
 
     SUBROUTINE PREPAREH5FILE(FNAME, RRI, NRRI, IRI, NIRI, R1, NR1, R2, NR2)
+        USE HDF5
         INTEGER, INTENT(IN) ::  NRRI, NIRI, NR1, NR2
         REAL*8, INTENT(IN)  ::  RRI(NRRI), IRI(NRRI), R1(NR1), R2(NR2)
         CHARACTER*80, INTENT(IN)    :: FNAME
+
+        CHARACTER(LEN=2), PARAMETER :: RE_NAME="RE"
+        CHARACTER(LEN=2), PARAMETER :: IM_NAME="IM"
+        CHARACTER(LEN=2), PARAMETER :: R1_NAME="R1"
+        CHARACTER(LEN=2), PARAMETER :: R2_NAME="R2"
+        CHARACTER(LEN=2), PARAMETER :: AP_NAME="AP"
+
+        INTEGER(HID_T)  ::  id_file, id_space, id_dset
+        INTEGER         ::  hdferr
+        INTEGER(HSIZE_T), DIMENSION(1:1) :: dims = (/0/)
+
+        !
+        ! Initialize FORTRAN interface.
+        !
+        CALL h5open_f(hdferr)
+        !
+        ! Create a new file using the default properties.
+        !
+        CALL h5fcreate_f(FNAME, H5F_ACC_TRUNC_F, id_file, hdferr)
+        !
+        ! Create dataspace.  Setting maximum size to be the current size.
+        ! Datasopace for storing RE
+        dims(1) = NRRI
+        CALL h5screate_simple_f(1, dims, id_space, hdferr)
+        ! Create the dataset.  We will use all default properties for this
+        ! example.
+        !
+        CALL h5dcreate_f(id_file, RE_NAME, H5T_IEEE_F64LE, id_space, id_dset, hdferr)
+
+
+        CALL h5dclose_f(id_dset , hdferr)
+        ! Close dataspace
+        CALL h5sclose_f(id_space, hdferr)
+        ! Close fortran file interface
+        CALL h5fclose_f(id_file, hdferr)
+        ! Close Fortran Interface
+        CALL h5close_f(hdferr)
+
     END SUBROUTINE PREPAREH5FILE
 
     subroutine createTEST()
@@ -19,7 +58,7 @@ CONTAINS
         INTEGER(HID_T)  :: file, space, dset ! Handles
         INTEGER         :: hdferr
         INTEGER(HSIZE_T), DIMENSION(1:2) :: dims = (/dim0, dim1/)
-        INTEGER(HSIZE_T), DIMENSION(1:2)   :: start, stride, count, block
+        INTEGER(HSIZE_T), DIMENSION(1:2) :: start, stride, count, block
 
         INTEGER, DIMENSION(1:dim0, 1:dim1) :: wdata, & ! Write buffer 
                                         rdata    ! Read buffer
